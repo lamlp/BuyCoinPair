@@ -10,6 +10,7 @@ namespace BuyCoinPair
     {
         private List<CoinModel> CoinList = new List<CoinModel>();
         private static decimal Balance = 100;
+        private static decimal GreaterValue = (decimal)0.5;
         public static void Main(string[] args) => new Program().InitData().GetAwaiter();
 
         private async Task InitData()
@@ -18,7 +19,7 @@ namespace BuyCoinPair
             while (true)
             {
                 await CheckCoin();
-                Thread.Sleep(2000);
+                Thread.Sleep(500);
             }
         }
 
@@ -43,8 +44,6 @@ namespace BuyCoinPair
 
         private async Task CheckCoin()
         {
-            List<CoinModel> coinListResult = new List<CoinModel>();
-
             foreach (var coin in CoinList)
             {
                 string firstPair = coin?.Pair?[0]?.Name ?? string.Empty;
@@ -74,9 +73,15 @@ namespace BuyCoinPair
                         decimal secondValue = coinResults.FirstOrDefault(x => x.Symbol == secondPair).Price;
                         decimal thirdValue = coinResults.FirstOrDefault(x => x.Symbol == thirdPair).Price;
                         var interestValue = ((Balance/firstValue)*secondValue*thirdValue)-Balance;
-                        Console.WriteLine("interestValue of " + symbolList + ": " + interestValue.ToString());
+                        if (interestValue < GreaterValue)
+                        {
+                            continue;
+                        }
+
                         // Todo
                         // await TradeCoin();
+
+                        Console.WriteLine("interestValue of " + symbolList + ": " + interestValue.ToString());
                     }
                 }
                 client.Dispose();

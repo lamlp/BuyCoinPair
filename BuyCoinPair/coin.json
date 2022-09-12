@@ -2,15 +2,15 @@
 	{
 		"Pair": [
 			{
-				"Name": "AXSBUSD",
+				"Name": "IRISUSDT",
 				"Order": 1
 			},
 			{
-				"Name": "AXSBTC",
+				"Name": "IRISBTC",
 				"Order": 2
 			},
 			{
-				"Name": "BTCBUSD",
+				"Name": "BTCUSDT",
 				"Order": 3
 			}
 		],
@@ -19,18 +19,52 @@
 	{
 		"Pair": [
 			{
-				"Name": "AVAXBUSD",
+				"Name": "WANUSDT",
 				"Order": 1
 			},
 			{
-				"Name": "AVAXBTC",
+				"Name": "WANBTC",
 				"Order": 2
 			},
 			{
-				"Name": "BTCBUSD",
+				"Name": "BTCUSDT",
 				"Order": 3
 			}
 		],
 		"Order": 2
+	},
+	{
+		"Pair": [
+			{
+				"Name": "WANUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "WANETH",
+				"Order": 2
+			},
+			{
+				"Name": "ETHUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 3
+	},
+	{
+		"Pair": [
+			{
+				"Name": "KMDUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "KMDBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 4
 	}
 ]

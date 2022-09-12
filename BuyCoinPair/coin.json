@@ -1,0 +1,36 @@
+[
+	{
+		"Pair": [
+			{
+				"Name": "AXSBUSD",
+				"Order": 1
+			},
+			{
+				"Name": "AXSBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCBUSD",
+				"Order": 3
+			}
+		],
+		"Order": 1
+	},
+	{
+		"Pair": [
+			{
+				"Name": "AVAXBUSD",
+				"Order": 1
+			},
+			{
+				"Name": "AVAXBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCBUSD",
+				"Order": 3
+			}
+		],
+		"Order": 2
+	}
+]

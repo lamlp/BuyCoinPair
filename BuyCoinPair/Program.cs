@@ -14,7 +14,7 @@ namespace BuyCoinPair
     {
         private List<CoinModel> CoinList = new List<CoinModel>();
         private static decimal Balance = 100;
-        private static decimal GreaterValue = (decimal)1.3;
+        private static decimal GreaterValue = (decimal)0.5;
         private static string apiKey = "hOjAjUks3KmWfAWKSBUCkyKx17GRYCKK73hpqJoEJRSfU6Jixhh2K3Iv4PO75hnT";
         private static string apiSecret = "yAunddYqfmxXixURCKNDNBUFMQxYBokMdCwdnjjOINStGnUAMdE4FNqPGUUNKnUV";
         private long MaxOrder = 0;
@@ -70,15 +70,21 @@ namespace BuyCoinPair
                     string thirdPair = coin?.Pair?[2]?.Name ?? string.Empty;
 
                     string symbolList = $"[\"{firstPair}\",\"{ secondPair }\",\"{ thirdPair}\"]";
-                    string result = await market.SymbolPriceTicker(symbols: symbolList);
-                    if (result != null)
+                    // string result = await market.SymbolPriceTicker(symbols: symbolList);
+                    var task1 = market.OrderBook(firstPair, 1);
+                    var task2 = market.OrderBook(secondPair, 1);
+                    var task3 = market.OrderBook(thirdPair, 1);
+                    var result = await Task.WhenAll(task1, task2, task3);
+                    if (result != null && result[0] != null && result[1] != null && result[2] != null)
                     {
-                        List<BinanceDataReceivedModel> coinResults = JsonConvert.DeserializeObject<List<BinanceDataReceivedModel>>(result);
-                        if (coinResults != null)
+                        OrderDepthModel coin1Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[0]);
+                        OrderDepthModel coin2Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[1]);
+                        OrderDepthModel coin3Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[2]);
+                        if (coin1Result != null && coin2Result != null && coin3Result != null)
                         {
-                            decimal firstValue = coinResults.FirstOrDefault(x => x.Symbol == firstPair).Price;
-                            decimal secondValue = coinResults.FirstOrDefault(x => x.Symbol == secondPair).Price;
-                            decimal thirdValue = coinResults.FirstOrDefault(x => x.Symbol == thirdPair).Price;
+                            decimal firstValue = coin1Result.Asks[0][0];
+                            decimal secondValue = coin2Result.Bids[0][0];
+                            decimal thirdValue = coin3Result.Bids[0][0];
                             var interestValue = ((Balance / firstValue) * secondValue * thirdValue) - Balance;
                             // Console.WriteLine(symbolList + " : " + interestValue.ToString());
                             if (interestValue < GreaterValue)

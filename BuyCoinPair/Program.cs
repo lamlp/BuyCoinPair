@@ -22,7 +22,8 @@ namespace BuyCoinPair
 
         private async Task InitData()
         {
-            await LoadJson();
+            await GetCoinData();
+            //await LoadJson();
             while (true)
             {
                 await CheckCoin();
@@ -31,25 +32,52 @@ namespace BuyCoinPair
             }
         }
 
-        private async Task LoadJson()
+        private async Task GetCoinData()
         {
-            List<CoinModel> items = new List<CoinModel>();
-            using (StreamReader r = new StreamReader("coin.json"))
+            long order = 0;
+            List<CoinModel> data = new List<CoinModel>(); 
+            Market market = new Market(
+                new HttpClient(),
+                apiKey: apiKey,
+                apiSecret: apiSecret);
+            string result = await market.SymbolPriceTicker();
+            List<BinanceDataReceivedModel> coinResult = JsonConvert.DeserializeObject<List<BinanceDataReceivedModel>>(result);
+            List<BinanceDataReceivedModel> coinEndWithUsdt = coinResult.Where(x => x.Symbol.EndsWith("USDT")).ToList();
+            List<string> coinNames = coinEndWithUsdt.Select(x => x.Symbol.Remove(x.Symbol.Length-4, 4)).ToList();
+            foreach(var coin in coinNames)
             {
-                string json = r.ReadToEnd();
-                var jsonResult = JsonConvert.DeserializeObject<List<CoinModel>>(json);
-                if (jsonResult != null)
+                //List<string> middleCoins = new List<string>() { "BTC", "ETH", "BNB", "AUD", "BIDR", "BRL", "EUR", "GBP", "RUB", "TRY", "TUSD", "DAI", "UAH", "VAI", "IDRT", "NGN" };
+                List<string> middleCoins = new List<string>() { "BTC", "ETH", "BNB" };
+
+                foreach (var middleCoin in middleCoins)
                 {
-                    foreach (var item in jsonResult)
+                    var alt = coinResult.FirstOrDefault(x => x.Symbol == $"{coin}{middleCoin}");
+                    if (alt != null)
                     {
-                        item.Pair = item?.Pair?.OrderBy(x => x.Order).ToList();
+                        order++;
+                        var coinData = new CoinModel();
+                        coinData.Order = order;
+                        var pair1 = new PairModel();
+                        pair1.Name = $"{coin}USDT";
+                        pair1.Order = 1;
+                        var pair2 = new PairModel();
+                        pair2.Name = $"{coin}{middleCoin}";
+                        pair2.Order = 2;
+                        var pair3 = new PairModel();
+                        pair3.Name = $"{middleCoin}USDT";
+                        pair3.Order = 3;
+                        coinData.Pair = new List<PairModel>();
+                        coinData.Pair.Add(pair1);
+                        coinData.Pair.Add(pair2);
+                        coinData.Pair.Add(pair3);
+                        data.Add(coinData);
                     }
-                    items = jsonResult.OrderBy(x => x.Order).ToList();
                 }
             }
 
-            MaxOrder = items.Max(x => x.Order);
-            CoinList = items;
+            /// ----- ///
+            MaxOrder = data.Max(x => x.Order);
+            CoinList = data;
         }
 
         private async Task CheckCoin()
@@ -70,7 +98,6 @@ namespace BuyCoinPair
                     string thirdPair = coin?.Pair?[2]?.Name ?? string.Empty;
 
                     string symbolList = $"[\"{firstPair}\",\"{ secondPair }\",\"{ thirdPair}\"]";
-                    // string result = await market.SymbolPriceTicker(symbols: symbolList);
                     var task1 = market.OrderBook(firstPair, 1);
                     var task2 = market.OrderBook(secondPair, 1);
                     var task3 = market.OrderBook(thirdPair, 1);

@@ -5,7 +5,7 @@ namespace BuyCoinPair.Models
     public class CoinModel
     {
         [JsonProperty("Pair")]
-        public List<PairModel>? Pair { get; set; }
+        public List<PairModel> Pair { get; set; }
         [JsonProperty("Order")]
         public long Order { get; set; }
     }

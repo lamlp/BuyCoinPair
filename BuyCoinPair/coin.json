@@ -36,23 +36,6 @@
 	{
 		"Pair": [
 			{
-				"Name": "WANUSDT",
-				"Order": 1
-			},
-			{
-				"Name": "WANETH",
-				"Order": 2
-			},
-			{
-				"Name": "ETHUSDT",
-				"Order": 3
-			}
-		],
-		"Order": 3
-	},
-	{
-		"Pair": [
-			{
 				"Name": "KMDUSDT",
 				"Order": 1
 			},
@@ -65,6 +48,720 @@
 				"Order": 3
 			}
 		],
+		"Order": 3
+	},
+	{
+		"Pair": [
+			{
+				"Name": "MOBUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "MOBBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
 		"Order": 4
+	},
+	{
+		"Pair": [
+			{
+				"Name": "OMUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "OMBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 5
+	},
+	{
+		"Pair": [
+			{
+				"Name": "AIONUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "AIONBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 6
+	},
+	{
+		"Pair": [
+			{
+				"Name": "DIAUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "DIABTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 7
+	},
+	{
+		"Pair": [
+			{
+				"Name": "FARMUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "FARMBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 8
+	},
+	{
+		"Pair": [
+			{
+				"Name": "PNTUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "PNTBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 9
+	},
+	{
+		"Pair": [
+			{
+				"Name": "ALPACAUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "ALPACABTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 10
+	},
+	{
+		"Pair": [
+			{
+				"Name": "UTKUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "UTKBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 11
+	},
+	{
+		"Pair": [
+			{
+				"Name": "QUICKUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "QUICKBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 12
+	},
+	{
+		"Pair": [
+			{
+				"Name": "DNTUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "DNTBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 13
+	},
+	{
+		"Pair": [
+			{
+				"Name": "LTOUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "LTOBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 14
+	},
+	{
+		"Pair": [
+			{
+				"Name": "GTOUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "GTOBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 15
+	},
+	{
+		"Pair": [
+			{
+				"Name": "ASRUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "ASRBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 16
+	},
+	{
+		"Pair": [
+			{
+				"Name": "HARDUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "HARDBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 17
+	},
+	{
+		"Pair": [
+			{
+				"Name": "BEAMUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "BEAMBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 18
+	},
+	{
+		"Pair": [
+			{
+				"Name": "PERLUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "PERLBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 19
+	},
+	{
+		"Pair": [
+			{
+				"Name": "XVSUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "XVSBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 20
+	},
+	{
+		"Pair": [
+			{
+				"Name": "DEGOUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "DEGOBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 21
+	},
+	{
+		"Pair": [
+			{
+				"Name": "MLNUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "MLNBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 22
+	},
+	{
+		"Pair": [
+			{
+				"Name": "AUTOUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "AUTOBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 23
+	},
+	{
+		"Pair": [
+			{
+				"Name": "XNOUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "XNOBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 24
+	},
+	{
+		"Pair": [
+			{
+				"Name": "ORNUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "ORNBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 25
+	},
+	{
+		"Pair": [
+			{
+				"Name": "WTCUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "WTCBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 26
+	},
+	{
+		"Pair": [
+			{
+				"Name": "AVAUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "AVABTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 27
+	},
+	{
+		"Pair": [
+			{
+				"Name": "FISUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "FISBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 28
+	},
+	{
+		"Pair": [
+			{
+				"Name": "CTXCUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "CTXCBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 29
+	},
+	{
+		"Pair": [
+			{
+				"Name": "JUVUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "JUVBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 30
+	},
+	{
+		"Pair": [
+			{
+				"Name": "CHESSUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "CHESSBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 31
+	},
+	{
+		"Pair": [
+			{
+				"Name": "DCRUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "DCRBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 32
+	},
+	{
+		"Pair": [
+			{
+				"Name": "RAREUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "RAREBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 33
+	},
+	{
+		"Pair": [
+			{
+				"Name": "MCUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "MCBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 34
+	},
+	{
+		"Pair": [
+			{
+				"Name": "ADXUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "ADXBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 35
+	},
+	{
+		"Pair": [
+			{
+				"Name": "MDXUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "MDXBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 36
+	},
+	{
+		"Pair": [
+			{
+				"Name": "BARUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "BARBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 37
+	},
+	{
+		"Pair": [
+			{
+				"Name": "POLSUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "POLSBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 38
+	},
+	{
+		"Pair": [
+			{
+				"Name": "TKOUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "TKOBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 39
+	},
+	{
+		"Pair": [
+			{
+				"Name": "MULTIUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "MULTIBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 40
+	},
+	{
+		"Pair": [
+			{
+				"Name": "ACMUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "ACMBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 41
+	},
+	{
+		"Pair": [
+			{
+				"Name": "TRUUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "TRUBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 42
+	},
+	{
+		"Pair": [
+			{
+				"Name": "VITEUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "VITEBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 43
+	},
+	{
+		"Pair": [
+			{
+				"Name": "NULSUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "NULSBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 44
+	},
+	{
+		"Pair": [
+			{
+				"Name": "ALCXUSDT",
+				"Order": 1
+			},
+			{
+				"Name": "ALCXBTC",
+				"Order": 2
+			},
+			{
+				"Name": "BTCUSDT",
+				"Order": 3
+			}
+		],
+		"Order": 45
 	}
 ]

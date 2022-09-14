@@ -22,13 +22,15 @@ namespace BuyCoinPair
 
         private async Task InitData()
         {
+            Console.WriteLine("Hello to BuyCoinPair................version 13.09.22");
+            Console.WriteLine("Loading coin data................");
             await GetCoinData();
+            Console.WriteLine("Loading coin data............DONE");
             //await LoadJson();
             while (true)
             {
                 await CheckCoin();
                 CoinList = CoinList.OrderBy(x => x.Order).ToList();
-                Thread.Sleep(500);
             }
         }
 
@@ -54,9 +56,7 @@ namespace BuyCoinPair
                     var alt = coinResult.FirstOrDefault(x => x.Symbol == $"{coin}{middleCoin}");
                     if (alt != null)
                     {
-                        order++;
                         var coinData = new CoinModel();
-                        coinData.Order = order;
                         var pair1 = new PairModel();
                         pair1.Name = $"{coin}USDT";
                         pair1.Order = 1;
@@ -70,12 +70,37 @@ namespace BuyCoinPair
                         coinData.Pair.Add(pair1);
                         coinData.Pair.Add(pair2);
                         coinData.Pair.Add(pair3);
+
+                       //check existing Coin
+                        var task1 = market.OrderBook(pair1.Name, 1);
+                        var task2 = market.OrderBook(pair2.Name, 1);
+                        var task3 = market.OrderBook(pair3.Name, 1);
+                        var resultOrders = await Task.WhenAll(task1, task2, task3);
+                        if (resultOrders != null && resultOrders[0] != null && resultOrders[1] != null && resultOrders[2] != null)
+                        {
+                            OrderDepthModel? coin1Result = JsonConvert.DeserializeObject<OrderDepthModel>(resultOrders[0]);
+                            OrderDepthModel? coin2Result = JsonConvert.DeserializeObject<OrderDepthModel>(resultOrders[1]);
+                            OrderDepthModel? coin3Result = JsonConvert.DeserializeObject<OrderDepthModel>(resultOrders[2]);
+                            if (coin1Result == null || coin2Result == null || coin3Result == null ||
+                                coin1Result.Asks == null || coin2Result.Asks == null || coin3Result.Asks == null ||
+                                coin1Result.Asks.Count() == 0 || coin2Result.Asks.Count() == 0 || coin3Result.Asks.Count() == 0)
+                            {
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        order++;
+                        Console.Write("\r{0} coins was added...", order);
+                        coinData.Order = order;
                         data.Add(coinData);
                     }
                 }
             }
 
-            /// ----- ///
             MaxOrder = data.Max(x => x.Order);
             CoinList = data;
         }
@@ -89,38 +114,48 @@ namespace BuyCoinPair
                     apiKey: apiKey,
                     apiSecret: apiSecret);
 
+
                 foreach (var coin in CoinList)
                 {
                     MaxOrder++;
                     coin.Order = MaxOrder;
-                    string firstPair = coin?.Pair?[0]?.Name ?? string.Empty;
-                    string secondPair = coin?.Pair?[1]?.Name ?? string.Empty;
-                    string thirdPair = coin?.Pair?[2]?.Name ?? string.Empty;
+                    string firstPair = coin.Pair[0].Name;
+                    string secondPair = coin.Pair[1].Name;
+                    string thirdPair = coin.Pair[2].Name;
 
-                    string symbolList = $"[\"{firstPair}\",\"{ secondPair }\",\"{ thirdPair}\"]";
+                    string symbolList = $"[\"{firstPair}\",\"{secondPair}\",\"{thirdPair}\"]";
                     var task1 = market.OrderBook(firstPair, 1);
                     var task2 = market.OrderBook(secondPair, 1);
                     var task3 = market.OrderBook(thirdPair, 1);
                     var result = await Task.WhenAll(task1, task2, task3);
                     if (result != null && result[0] != null && result[1] != null && result[2] != null)
                     {
-                        OrderDepthModel coin1Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[0]);
-                        OrderDepthModel coin2Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[1]);
-                        OrderDepthModel coin3Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[2]);
+                        OrderDepthModel? coin1Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[0]);
+                        OrderDepthModel? coin2Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[1]);
+                        OrderDepthModel? coin3Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[2]);
                         if (coin1Result != null && coin2Result != null && coin3Result != null)
                         {
-                            decimal firstValue = coin1Result.Asks[0][0];
-                            decimal secondValue = coin2Result.Bids[0][0];
-                            decimal thirdValue = coin3Result.Bids[0][0];
-                            var interestValue = ((Balance / firstValue) * secondValue * thirdValue) - Balance;
-                            // Console.WriteLine(symbolList + " : " + interestValue.ToString());
+                            decimal interestValue = 0;
+                            try
+                            {
+                                decimal firstValue = coin1Result.Asks[0][0];
+                                decimal secondValue = coin2Result.Bids[0][0];
+                                decimal thirdValue = coin3Result.Bids[0][0];
+                                interestValue = ((Balance / firstValue) * secondValue * thirdValue) - Balance;
+                                Console.WriteLine(symbolList + " : " + interestValue.ToString());
+                            }
+                            catch
+                            {
+                                continue;
+                            }
+
                             if (interestValue < GreaterValue)
                             {
                                 continue;
                             }
 
                             var exchangeInfoResult = await market.ExchangeInformation(symbols: symbolList);
-                            ExchangeRecivedModel exchangeInfos = JsonConvert.DeserializeObject<ExchangeRecivedModel>(exchangeInfoResult);
+                            ExchangeRecivedModel? exchangeInfos = JsonConvert.DeserializeObject<ExchangeRecivedModel>(exchangeInfoResult);
                             Console.WriteLine("Buying................" + symbolList + ": " + interestValue.ToString());
 
                             var isTraded = await TradeCoin(firstPair, secondPair, thirdPair, exchangeInfos);

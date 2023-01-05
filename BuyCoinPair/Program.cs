@@ -1,4 +1,5 @@
 ﻿
+using BuyCoinPair.Common;
 using BuyCoinPair.Models;
 using BuyCoinPair.Spot;
 using Moq;
@@ -7,43 +8,105 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.WebSockets;
+using Websocket.Client;
 
 namespace BuyCoinPair
 {
     class Program
     {
         private List<CoinModel> CoinList = new List<CoinModel>();
+        List<WebsocketCoinModel> CoinPairs = new List<WebsocketCoinModel>();
         private static decimal Balance = 100;
-        private static decimal GreaterValue = (decimal)0.44;
-        private static string apiKey = "hOjAjUks3KmWfAWKSBUCkyKx17GRYCKK73hpqJoEJRSfU6Jixhh2K3Iv4PO75hnT";
-        private static string apiSecret = "yAunddYqfmxXixURCKNDNBUFMQxYBokMdCwdnjjOINStGnUAMdE4FNqPGUUNKnUV";
-        private long MaxOrder = 0;
-        private long CoinTotal = 0;
-        private long APICount = 0;
-        private Stopwatch stopWatch = new Stopwatch();
+        private static decimal GreaterValue = (decimal)0.34;
+        private static string apiKey = "";
+        private static string apiSecret = "";
         public static void Main(string[] args) => new Program().InitData().GetAwaiter();
 
         private async Task InitData()
         {
             Console.WriteLine("Welcome to BuyCoinPair................version 14.09.22");
             Console.WriteLine("Loading coin data................");
+
             await LoadJson();
+            await HandleWebsocket();
             //await GetCoinData();
-            Console.WriteLine("\nLoading coin data............DONE");
-            // wait 1 minutes for resetting api limit
-            // Console.WriteLine("Wait 1 minutes for resetting api limit...");
-            // Thread.Sleep(61000);
-            // Console.WriteLine("OK.");
-            long countRound = 0;
-            stopWatch.Start();
-            while (true)
+        }
+
+        private async Task HandleWebsocket()
+        {
+            ManualResetEvent ExitEvent = new ManualResetEvent(false);
+
+            var factory = new Func<ClientWebSocket>(() =>
             {
-                countRound++;
-                Console.WriteLine("START SCANING COIN LIST " + countRound.ToString());
-                await CheckCoin();
-                CoinList = CoinList.OrderBy(x => x.Order).ToList();
-                Console.WriteLine("\nFINISHED SCANING COIN LIST " + countRound.ToString());
-                Console.WriteLine("----------------------------------------");
+                var client = new ClientWebSocket
+                {
+                    Options =
+                    {
+                        KeepAliveInterval = TimeSpan.FromSeconds(30),
+                    }
+                };
+                return client;
+            });
+
+
+            var url = new Uri("wss://stream.binance.com:9443/ws/BTCUSDT@trade");
+
+            string[] requestCoinNames = CoinPairs.Select(pair => $"{pair.Name.ToLower()}@depth").ToArray();
+
+            string[] pair1List = CoinList.Select(x => x.Pair.OrderBy(x => x.Order).First().Name).ToArray();
+
+            // int numberLoops = CoinPairs.Count() / 100;
+
+            // requestCoinNames = requestCoinNames.Take(200).ToArray();
+
+            using (IWebsocketClient client = new WebsocketClient(url, factory))
+            {
+
+
+                client.ReconnectTimeout = TimeSpan.FromSeconds(30);
+                client.ErrorReconnectTimeout = TimeSpan.FromSeconds(30);
+                client.ReconnectionHappened.Subscribe(info =>
+                {
+                    Console.WriteLine($"Reconnection happened, type: {info.Type}, url: {client.Url}");
+                });
+                client.DisconnectionHappened.Subscribe(info =>
+                    Console.WriteLine($"Disconnection happened, type: {info.Type}"));
+
+                client.MessageReceived.Subscribe(msg =>
+                {
+                    var result = JsonConvert.DeserializeObject<WebsocketDepthModel>(msg?.Text);
+                    if (result != null && result.Name != null && result.Asks != null && result.Asks.Count() > 3 && result.Bids != null && result.Bids.Count() > 3)
+                    {
+                        var coin = CoinPairs.FirstOrDefault(x => x.Name == result.Name);
+                        if (coin != null)
+                        {
+                            coin.AskPrice = (result.Asks[0][0] + result.Asks[1][0]) / 2;
+                            coin.BidPrice = (result.Bids[0][0] + result.Bids[1][0]) / 2;
+                                // Console.WriteLine($"{result.Name}: {coin.AskPrice}, {coin.BidPrice}");
+                            if (pair1List.Contains(coin.Name))
+                            {
+                                var altName = coin.Name.Remove(coin.Name.Length - 4);
+                                CheckCoin(coin.Name, altName+"BNB", "BNBBUSD");
+                            }
+                        }
+                    }
+                });
+
+                Console.WriteLine("Starting...");
+                client.Start().Wait();
+                Console.WriteLine("Started.");
+
+                //for (int i = 0; i <= numberLoops; i++)
+                //{
+                //    var loopRequestCoins = requestCoinNames.Skip(i * 100).Take(100).ToArray();
+                //    var requestObj = new WebsocketRequestModel() { method = "SUBSCRIBE", id = 1, Params = loopRequestCoins };
+                //    Task.Run(() => client.Send(JsonConvert.SerializeObject(requestObj)));
+                //}
+                var requestObj = new WebsocketRequestModel() { method = "SUBSCRIBE", id = 1, Params = requestCoinNames };
+                Task.Run(() => client.Send(JsonConvert.SerializeObject(requestObj)));
+
+                ExitEvent.WaitOne();
             }
         }
 
@@ -59,20 +122,25 @@ namespace BuyCoinPair
                     foreach (var item in jsonResult)
                     {
                         item.Pair = item?.Pair?.OrderBy(x => x.Order).ToList();
+                        foreach (var coinInPair in item?.Pair)
+                        {
+                            if (!string.IsNullOrEmpty(coinInPair.Name) && !CoinPairs.Exists(x => x.Name == coinInPair.Name))
+                            {
+                                CoinPairs.Add(new WebsocketCoinModel { Name = coinInPair.Name });
+                            }
+                        }
                     }
                     items = jsonResult.OrderBy(x => x.Order).ToList();
                 }
             }
 
-            MaxOrder = items.Max(x => x.Order);
-            CoinTotal = items.Count();
             CoinList = items;
         }
 
         private async Task GetCoinData()
         {
             long order = 0;
-            List<CoinModel> data = new List<CoinModel>(); 
+            List<CoinModel> data = new List<CoinModel>();
             Market market = new Market(
                 new HttpClient(),
                 apiKey: apiKey,
@@ -84,9 +152,9 @@ namespace BuyCoinPair
             List<string> coinNameUsdts = coinEndWithUsdt.Select(x => x.Symbol.Remove(x.Symbol.Length - 4, 4)).ToList();
             List<string> coinNameBusds = coinEndWithBusd.Select(x => x.Symbol.Remove(x.Symbol.Length - 4, 4)).ToList();
 
-            List<string> middleCoins = new List<string>() { "BTC", "ETH", "BNB", "AUD", "BIDR", "BRL", "EUR", "GBP", "RUB", "TRY", "TUSD", "DAI", "UAH", "VAI", "IDRT", "NGN" };
+            // List<string> middleCoins = new List<string>() { "BTC", "ETH", "BNB", "AUD", "BIDR", "BRL", "EUR", "GBP", "RUB", "TRY", "TUSD", "DAI", "UAH", "VAI", "IDRT", "NGN" };
             // List<string> middleCoins = new List<string>() { "BTC", "ETH", "BNB" };
-            // List<string> middleCoins = new List<string>() { "ETH" };
+            List<string> middleCoins = new List<string>() { "BNB" };
 
             foreach (var coin in coinNameBusds)
             {
@@ -206,79 +274,64 @@ namespace BuyCoinPair
                 }
             }
 
-            MaxOrder = data.Max(x => x.Order);
-            CoinTotal = data.Count();
             CoinList = data;
         }
 
-        private async Task CheckCoin()
+        private async Task CheckCoin(string coinName, string coin2, string coin3)
         {
             try
             {
-                Market market = new Market(
-                    new HttpClient(),
-                    apiKey: apiKey,
-                    apiSecret: apiSecret);
+                //var coin = CoinList.FirstOrDefault(x => x.Pair.OrderBy(x => x.Order).First().Name == coinName);
+                //if (coin == null)
+                //{
+                //    return;
+                //}
 
-                long count = 0;
-                Parallel.ForEach(CoinList, new ParallelOptions { MaxDegreeOfParallelism = 5 }, async (coin, state) =>
+                //foreach (var coin in listCoinPairContain)
+                //{
+                string firstPair = coinName;
+                string secondPair = coin2;
+                string thirdPair = coin3;
+
+                string symbolList = $"[\"{firstPair}\",\"{secondPair}\",\"{thirdPair}\"]";
+
+
+                var coin1Result = CoinPairs.FirstOrDefault(x => x.Name == firstPair);
+                var coin2Result = CoinPairs.FirstOrDefault(x => x.Name == secondPair);
+                var coin3Result = CoinPairs.FirstOrDefault(x => x.Name == thirdPair);
+                if (coin1Result != null && coin2Result != null && coin3Result != null && coin1Result.AskPrice > 0 && coin2Result.AskPrice > 0 && coin3Result.AskPrice > 0)
                 {
-                    count++;
-                    Console.Write("\r{0}\\{1} ( {2}% )", count, CoinTotal, GetPercent(count, CoinTotal));
-                    MaxOrder++;
-                    coin.Order = MaxOrder;
-                    string firstPair = coin.Pair[0].Name;
-                    string secondPair = coin.Pair[1].Name;
-                    string thirdPair = coin.Pair[2].Name;
-
-                    string symbolList = $"[\"{firstPair}\",\"{secondPair}\",\"{thirdPair}\"]";
-                    APICount = APICount + 3;
-                    if (APICount > 1000)
+                    decimal interestValue = 0;
+                    try
                     {
-                        Thread.Sleep(62000-(int)stopWatch.ElapsedMilliseconds);
-                        APICount = 0;
-                        stopWatch = Stopwatch.StartNew();
-                    }
-                    var task1 = market.OrderBook(firstPair, 1);
-                    var task2 = market.OrderBook(secondPair, 1);
-                    var task3 = market.OrderBook(thirdPair, 1);
-                    var result = await Task.WhenAll(task1, task2, task3);
-                    if (result != null && result[0] != null && result[1] != null && result[2] != null)
-                    {
-                        OrderDepthModel? coin1Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[0]);
-                        OrderDepthModel? coin2Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[1]);
-                        OrderDepthModel? coin3Result = JsonConvert.DeserializeObject<OrderDepthModel>(result[2]);
-                        if (coin1Result != null && coin2Result != null && coin3Result != null)
+                        decimal firstValue = coin1Result.AskPrice;
+                        decimal secondValue = coin2Result.BidPrice;
+                        decimal thirdValue = coin3Result.BidPrice;
+                        interestValue = ((Balance / firstValue) * secondValue * thirdValue) - Balance;
+                        //Show pair
+                        if (interestValue > 0)
                         {
-                            decimal interestValue = 0;
-                            try
-                            {
-                                decimal firstValue = coin1Result.Asks[0][0];
-                                decimal secondValue = coin2Result.Bids[0][0];
-                                decimal thirdValue = coin3Result.Bids[0][0];
-                                interestValue = ((Balance / firstValue) * secondValue * thirdValue) - Balance;
-                                //Show pair
-                                //Console.WriteLine(symbolList + " : " + interestValue.ToString());
-                            }
-                            catch
-                            {
-                                return;
-                            }
-
-                            if (interestValue < GreaterValue)
-                            {
-                                return;
-                            }
-
-                            var exchangeInfoResult = await market.ExchangeInformation(symbols: symbolList);
-                            ExchangeRecivedModel exchangeInfos = JsonConvert.DeserializeObject<ExchangeRecivedModel>(exchangeInfoResult);
-                            Console.WriteLine("\nBuying................" + symbolList + ": " + interestValue.ToString());
-
-                            var isTraded = await TradeCoin(firstPair, secondPair, thirdPair, exchangeInfos);
-                            state.Break();
+                            Console.WriteLine(symbolList + " : " + interestValue.ToString());
                         }
+                        //Console.WriteLine(symbolList + " : " + interestValue.ToString());
                     }
-                });
+                    catch
+                    {
+                        return;
+                    }
+
+                    if (interestValue < GreaterValue)
+                    {
+                        return;
+                    }
+
+
+                    Console.WriteLine("\nBuying................" + symbolList + ": " + interestValue.ToString());
+
+                    var isTraded = await TradeCoin(firstPair, secondPair, thirdPair, symbolList);
+                }
+                //}
+                //};
             }
             catch (Exception ex)
             {
@@ -287,7 +340,7 @@ namespace BuyCoinPair
             }
         }
 
-        private async Task<bool> TradeCoin(string pair1Name, string pair2Name, string pair3Name, ExchangeRecivedModel exchangeInfos)
+        private async Task<bool> TradeCoin(string pair1Name, string pair2Name, string pair3Name, string symbolList)
         {
             try
             {
@@ -296,6 +349,13 @@ namespace BuyCoinPair
                     apiKey: apiKey,
                     apiSecret: apiSecret);
 
+                Market market = new Market(
+                    new HttpClient(),
+                    apiKey: apiKey,
+                    apiSecret: apiSecret);
+
+                var exchangeInfoResult = await market.ExchangeInformation(symbols: symbolList);
+                ExchangeRecivedModel exchangeInfos = JsonConvert.DeserializeObject<ExchangeRecivedModel>(exchangeInfoResult);
                 var resultPair1 = await spotAccountTrade.NewOrder(pair1Name, Side.BUY, OrderType.MARKET, quoteOrderQty: Balance);
                 var resultPair1Object = JsonConvert.DeserializeObject<OrderModel>(resultPair1);
                 var resultPair2 = await spotAccountTrade.NewOrder(pair2Name, Side.SELL, OrderType.MARKET, quantity: ConvertQuantity(resultPair1Object.OrigQty, pair2Name, exchangeInfos));
@@ -319,13 +379,13 @@ namespace BuyCoinPair
                 return quantity;
             }
             var lotSize = symbol.Filters.FirstOrDefault(x => x.FilterType == "LOT_SIZE");
-            
+
             if (lotSize == null || lotSize.MinQty == 0)
             {
                 return quantity;
             }
 
-            return ((int)(quantity / lotSize.MinQty) * lotSize.MinQty)/1.000000000000000000000000000000000m;
+            return ((int)(quantity / lotSize.MinQty) * lotSize.MinQty) / 1.000000000000000000000000000000000m;
         }
 
         private double GetPercent(long count, long total)
